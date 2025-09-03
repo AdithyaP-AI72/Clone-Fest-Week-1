@@ -82,147 +82,275 @@ Bonus Innovation (0–5): Creative features or extensions beyond the requirement
  Take the legacy Chyrp blog engine and bring it into today’s web world. Implement its features, deploy it live, and show us how you reimagined blogging for the modern age.
 
 # Division of Work : 
-Day 1:
-A -> Build Backend skeleton + 2 routes(/register,/posts)
-B -> Bui,d frontend pages with dummy datas
-C -> Deploy both projects to cloud + GitHub
+Team Roles & Responsibilities
+Our team will be structured with three distinct roles to maximize parallel development and efficiency:
 
-Day 2:
-A -> Add authentication + /new-post
-B -> Connect forms to backend APIs
-C -> Wire frontend to deployed backend API 
+The Backend Specialist: Focuses on the server-side application logic and the database.
 
-Day 3:
-A-> Add file upload
-B -> Add markdown rendering + Polish UI
-C -> Add Likes/Tags + finalize docs
+The Frontend Specialist: Focuses on the user interface and user experience.
 
+The DevOps & Integration Specialist: Focuses on connecting the two layers, managing the codebase, and handling deployment.
+
+Day 1: Local Development & Core Logic
+Backend Specialist (A)
+
+Goal: Build the core data model and API endpoints.
+
+Tasks:
+
+Set up a Flask project with a local SQLite database.
+
+Create the Post database model with fields for title, content, and type.
+
+Implement the /api/posts endpoints for creating and retrieving posts.
+
+Begin documenting the API endpoints and their expected data formats for the Frontend specialist.
+
+Frontend Specialist (B)
+
+Goal: Build the main user interface components using dummy data.
+
+Tasks:
+
+Set up a Vue 3 project with Vite.
+
+Build the main application layout (header, footer, etc.).
+
+Create components for displaying a list of posts and a form for creating a new post.
+
+Use mock JSON data to simulate the API response, allowing you to build the UI independently.
+
+DevOps & Integration Specialist (C)
+
+Goal: Establish the collaborative environment and initial project structure.
+
+Tasks:
+
+Create the GitHub repository for the team.
+
+Define the file structure (/backend and /frontend folders).
+
+Write the initial README.md file with project details and this plan.
+
+Help Team Members A and B with any initial setup issues (e.g., Python or Node.js versions).
+
+Day 2: API Integration & Feature Expansion
+Backend Specialist (A)
+
+Goal: Extend the core API and implement a key module.
+
+Tasks:
+
+Add a Tags database table and create a many-to-many relationship with the Post model.
+
+Implement the API endpoints to create and retrieve tags, and to associate them with posts.
+
+Add support for other Feathers to the Post model (e.g., a media_url field for photos/videos).
+
+Frontend Specialist (B)
+
+Goal: Connect the UI to the backend's live API and build new features.
+
+Tasks:
+
+Replace the dummy data with actual axios calls to the backend's API.
+
+Build the user interface for adding and displaying Tags on posts.
+
+Implement the Read More truncation feature for long posts.
+
+Create a simple light/dark theme toggle to fulfill the "theme support" requirement.
+
+DevOps & Integration Specialist (C)
+
+Goal: Facilitate the integration process and prepare for deployment.
+
+Tasks:
+
+Debug any API-related issues that arise from frontend/backend communication (e.g., CORS).
+
+Update the README.md with a "Getting Started" section, including detailed instructions on how to run both servers locally.
+
+Research and set up accounts on a free hosting service for both the frontend (e.g., Vercel) and backend (e.g., Render).
+
+Day 3: Polishing, Documentation & Final Deployment
+Backend Specialist (A)
+
+Goal: Finalize the backend code and add a bonus feature.
+
+Tasks:
+
+Add a simple Likes feature to the Post model and create a corresponding API endpoint to increment the count.
+
+Ensure all API endpoints are returning correct status codes and error messages.
+
+Perform a final code review and clean up.
+
+Frontend Specialist (B)
+
+Goal: Polish the UI and complete the feature set.
+
+Tasks:
+
+Refine the overall look and feel of the site to be more modern and visually appealing.
+
+Implement the "Likes" button and connect it to the backend API.
+
+Ensure the application is fully responsive and free of any major bugs.
+
+DevOps & Integration Specialist (C)
+
+Goal: Deploy the entire application and complete all submission requirements.
+
+Tasks:
+
+Deploy the backend to the chosen hosting provider.
+
+Deploy the frontend to the chosen hosting provider.
+
+Update the frontend's API URL to point to the live, deployed backend.
+
+Finalize the README.md file with a "Live Demo" link and a detailed list of all implemented features.
+
+Add any "Bonus Innovation" notes for the judges.
+
+Submit the project.
 # Checklist : 
-👤 Person A → Backend (FastAPI + SQLite)
 
-Day 1
+Team Member 1: The Backend Specialist
+Your focus is on building the server-side logic and managing the database.
 
-[ ] Install FastAPI & libraries:
+Day 1: Setup & Core API
+[ ] Initialize the Git repository and a Python virtual environment.
 
-pip install fastapi uvicorn sqlalchemy passlib[bcrypt] python-jose
+[ ] Install Flask, Flask-SQLAlchemy, and Flask-CORS.
 
-[ ] Create main.py with FastAPI "Hello World".
+[ ] Create the database schema with a Post model (at a minimum, include title, content, and type fields).
 
-[ ] Setup SQLite DB with SQLAlchemy.
+[ ] Implement the following REST API endpoints:
 
-[ ] Make User model (id, username, password_hash).
+[ ] POST /api/posts to create a new post.
 
-[ ] Add POST /register route → save new user.
+[ ] GET /api/posts to retrieve all posts.
 
-[ ] Add GET /posts route → return dummy posts list.
+[ ] GET /api/posts/<id> to get a single post.
 
-[ ] Run uvicorn main:app --reload and test /docs (Swagger).
+[ ] Test all endpoints using a tool like Postman or curl.
 
+[ ] Start a shared document (e.g., a Google Doc or a Markdown file in the repo) to list all your API endpoints and their expected responses.
 
-Day 2
+Day 2: Feathers & Modules
+[ ] Extend the Post model to support different Feathers.
 
-[ ] Add POST /login (JWT auth).
+[ ] Add a media_url field for Photo, Video, and Audio content types.
 
-[ ] Add Post model (id, title, content, created_at, user_id).
+[ ] Add a link_url field for the Link feather.
 
-[ ] Add POST /posts (create new post).
+[ ] Add a new database table for Tags.
 
-[ ] Test register → login → create post → fetch posts flow.
+[ ] Create an API to handle tags:
 
-[ ] Push backend code to GitHub.
+[ ] GET /api/tags to retrieve all available tags.
 
+[ ] POST /api/posts/<id>/tags to add a tag to a post.
 
-Day 3 (Half Day)
+[ ] GET /api/tags/<name>/posts to get posts by a specific tag.
 
-[ ] Add photo upload (store locally or base64).
+[ ] Create a simplified User model and a basic endpoint for user management. This can be as simple as a single, hardcoded user.
 
-[ ] Clean code (remove unused stuff).
+Day 3: Polish & Deployment
+[ ] Review all API endpoints for consistency and robustness. Add basic error handling (e.g., returning a 404 for a post not found).
 
-[ ] Help Person B debug API integration if needed.
+[ ] Create a requirements.txt file by running pip freeze > requirements.txt.
 
+[ ] Write a Procfile if your chosen hosting service requires it.
 
+[ ] Coordinate with the DevOps specialist to ensure the backend is ready for deployment.
 
----
+[ ] Work with the Frontend specialist to resolve any integration issues (e.g., data format or API endpoint names).
 
-👤 Person B → Frontend (Next.js + Tailwind)
+Team Member 2: The Frontend Specialist
+Your role is to build the user-facing application that interacts with the backend.
 
-Day 1
+Day 1: Setup & Core UI
+[ ] Use Vite to scaffold a new Vue 3 project.
 
-[ ] Install Node.js (if not installed).
+[ ] Set up basic routing using Vue Router (e.g., a home page and a "create post" page).
 
-[ ] Create Next.js app:
+[ ] Build the main application layout and basic navigation.
 
-npx create-next-app frontend
-cd frontend
-npm install tailwindcss postcss autoprefixer
-npx tailwindcss init -p
+[ ] Create a form component for creating Text Feathers.
 
-[ ] Configure Tailwind in globals.css.
+[ ] Install axios and connect your form to the POST /api/posts endpoint.
 
-[ ] Create pages: /register, /login, /posts, /new-post.
+[ ] Create a component to fetch data from the GET /api/posts endpoint and display the posts on the home page.
 
-[ ] Add forms for register/login with dummy submit.
+Day 2: Feathers & Modules UI
+[ ] Create distinct form views or a dynamic form for Photo, Link, and Quote feathers.
 
-[ ] Create a post list UI with dummy posts.
+[ ] Use conditional rendering to show different input fields based on the selected feather type.
 
+[ ] Implement the Tags UI.
 
-Day 2
+[ ] Create an input field or dropdown for users to add tags to a post.
 
-[ ] Install Axios (npm install axios).
+[ ] Display the tags associated with each post on the home page.
 
-[ ] Connect /register form → backend API.
+[ ] Build the Read More functionality to truncate long posts on the feed.
 
-[ ] Connect /login form → backend API (store JWT in localStorage).
+[ ] Implement a basic Theme support feature, like a light/dark mode toggle button.
 
-[ ] Connect /posts → backend GET /posts.
+Day 3: Polish & Final Touches
+[ ] Ensure the entire application is responsive and looks good on various screen sizes.
 
-[ ] Connect /new-post → backend POST /posts.
+[ ] Add a "loading" state to your data fetching components to improve user experience.
 
-[ ] Install & test Markdown renderer (npm install react-markdown).
+[ ] Implement basic form validation and error messages.
 
+[ ] Work with the DevOps specialist to prepare your code for deployment to a service like Netlify or Vercel.
 
-Day 3 (Half Day)
+[ ] Do a final run-through of the user journey, from creating a post to viewing it, and fix any bugs.
 
-[ ] Polish UI with Tailwind (mobile responsive).
+Team Member 3: The DevOps & Integration Specialist
+You are the project manager, documentation writer, and deployment engineer.
 
-[ ] Add Markdown rendering in post details.
+Day 1: Environment & Collaboration
+[ ] Create the central Git repository and manage user access.
 
-[ ] Test full flow: register → login → new post → see post.
+[ ] Help the team set up their local development environments.
 
+[ ] Configure CORS on the Flask backend to allow communication from the frontend.
 
+[ ] Create the main README.md file. Add sections for:
 
----
+[ ] Project Title & Team Members
 
-👤 Person C → Deployment + Docs + Bonus
+[ ] A brief project overview
 
-Day 1
+[ ] Suggested Tech Stack
 
-[ ] Create GitHub repo → add frontend/ + backend/ folders.
+[ ] Define the file structure (/frontend and /backend).
 
-[ ] Deploy backend to Render (basic "Hello World").
+Day 2: Documentation & Integration
+[ ] Continuously update the README.md with features as they are implemented.
 
-[ ] Deploy frontend to Vercel (basic Next.js app).
+[ ] Create a clear "Getting Started" section in the README with step-by-step instructions for running both the frontend and backend locally.
 
-[ ] Share live links with team.
+[ ] Include commands like pip install -r requirements.txt and npm install.
 
+[ ] Help the frontend and backend specialists troubleshoot any integration issues (e.g., API endpoint URLs, data format mismatches).
 
-Day 2
+[ ] Research and select the final hosting services for both the frontend (e.g., Vercel, Netlify) and the backend (e.g., Render, PythonAnywhere).
 
-[ ] Update backend deployment with real API (from Person A).
+Day 3: Deployment & Submission
+[ ] Deploy the frontend to a static hosting service.
 
-[ ] Update frontend deployment with real API URL.
+[ ] Deploy the backend to a cloud provider.
 
-[ ] Confirm frontend can talk to backend in deployed version.
+[ ] Update the frontend to point to the live backend API URL.
 
-[ ] Write basic README: project description + setup instructions.
+[ ] Update the README.md with the link to the live, deployed instance.
 
+[ ] Write a brief summary of any Bonus Innovation features for the judges.
 
-Day 3 (Half Day)
-
-[ ] Add simple Likes API (increment counter) OR Tags support.
-
-[ ] Add screenshots of deployed site to README.
-
-[ ] Polish README with tech stack + demo link.
-
-[ ] Run final checks: register/login/posts on live site.
+[ ] Do a final check of all deliverables and the README.md to ensure everything is perfect for submission.
