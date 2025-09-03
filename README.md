@@ -1,6 +1,6 @@
 # CloneFest-Week-1
 
-#Problem Statement : 
+# Problem Statement : 
 📝 CloneFest 2025 Problem Statement: Modernizing Chyrp
 Background
 Chyrp is a lightweight, extensible blogging engine originally written to be simple yet powerful. It allowed bloggers to publish content in multiple formats (“Feathers”), extend functionality via modules, and customize appearance with themes. While innovative in its time, Chyrp now feels outdated compared to today’s modern, responsive, API-driven web applications.
@@ -97,7 +97,7 @@ A-> Add file upload
 B -> Add markdown rendering + Polish UI
 C -> Add Likes/Tags + finalize docs
 
-#Checklist : 
+# Checklist : 
 👤 Person A → Backend (FastAPI + SQLite)
 
 Day 1
