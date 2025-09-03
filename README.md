@@ -245,3 +245,8 @@ Our team will be structured with three distinct roles to maximize parallel devel
 * [ ] Update the `README.md` with the link to the live, deployed instance.
 * [ ] Write a brief summary of any Bonus Innovation features for the judges.
 * [ ] Do a final check of all deliverables and the `README.md` to ensure everything is perfect for submission.
+
+# TEAM : 
+PERSON 1 - 
+PERSON 2 - DIA
+PERSON 3 - 
