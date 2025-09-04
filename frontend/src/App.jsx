@@ -1,69 +1,52 @@
 import React, { useState, useEffect } from 'react';
-import {
-  onAuthStateChanged,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signOut,
-  // To keep this template simple, we are not connecting to Firebase yet.
-  // In a real app, you would import User type from 'firebase/auth'
-} from 'firebase/auth';
-// Mocks for Firebase - uncomment the real imports when connecting
-// import { auth, db } from './firebase'; 
 
-// --- Mock Data & Functions (for UI development without Firebase) ---
-const mockAuth = {
-  onAuthStateChanged: (callback) => {
-    setTimeout(() => callback(null), 1000); // Simulate not being logged in initially
-    return () => { }; // Return an unsubscribe function
-  },
-  signOut: () => new Promise(res => res()),
-};
-
-const FAKE_USER = { uid: '123', email: 'admin@example.com' };
+// --- API Configuration ---
+const API_URL = 'http://127.0.0.1:5000/api';
 
 // --- Main App Component ---
 export default function App() {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState('home'); // 'home' or 'admin'
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // Simple state to toggle between public and admin
+  const [loading, setLoading] = useState(false); // Set to false initially, no auth check needed for now
 
-  // Simulate auth state change
-  useEffect(() => {
-    // Replace mockAuth with the real 'auth' from firebase.js
-    const unsubscribe = mockAuth.onAuthStateChanged(user => {
-      setUser(user);
-      setLoading(false);
-    });
-    return unsubscribe;
-  }, []);
-
-  const handleLogin = () => setUser(FAKE_USER);
-  const handleLogout = () => {
-    mockAuth.signOut();
-    setUser(null);
-    setPage('home');
-  };
+  const handleLogin = () => setIsLoggedIn(true);
+  const handleLogout = () => setIsLoggedIn(false);
 
   if (loading) {
     return <div className="bg-gray-100 min-h-screen flex items-center justify-center">Loading...</div>;
   }
 
-  if (!user) {
+  if (!isLoggedIn) {
     return <PublicSite onLogin={handleLogin} />;
   }
 
-  return <AdminDashboard user={user} onLogout={handleLogout} />;
+  return <AdminDashboard onLogout={handleLogout} />;
 }
 
 
 // --- Public Facing Site Component ---
 const PublicSite = ({ onLogin }) => {
-  // This component renders the public view from the first screenshot
+  const [posts, setPosts] = useState([]);
+
+  // Fetch posts for the public view
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const response = await fetch(`${API_URL}/posts`);
+        if (!response.ok) throw new Error('Network response was not ok');
+        const data = await response.json();
+        setPosts(data);
+      } catch (error) {
+        console.error("Failed to fetch posts:", error);
+        // Don't show an error on the public page, just an empty state.
+      }
+    };
+    fetchPosts();
+  }, []);
+
   return (
     <div className="bg-[#F5F5DC] min-h-screen font-sans text-gray-800">
       <header className="container mx-auto px-6 py-4 flex justify-between items-center">
         <h1 className="text-3xl font-bold">My Awesome Site</h1>
-        {/* A simple login button for demonstration */}
         <button
           onClick={onLogin}
           className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
@@ -79,17 +62,25 @@ const PublicSite = ({ onLogin }) => {
               <svg className="w-5 h-5 absolute right-3 top-2.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
             </div>
             <nav className="flex flex-col space-y-1">
-              {['Blog', 'Email', 'Feed', 'Admin', 'Controls', 'Log out'].map(item => (
+              {['Blog', 'Email', 'Feed', 'Admin', 'Controls'].map(item => (
                 <a key={item} href="#" className="px-3 py-2 text-gray-700 rounded-md hover:bg-gray-100">{item}</a>
               ))}
             </nav>
           </div>
         </aside>
-        <section className="md:col-span-3">
-          <div className="bg-blue-600 text-white p-4 rounded-lg shadow-md text-center">
-            Nothing here yet!
-          </div>
-          {/* Blog posts would be rendered here */}
+        <section className="md:col-span-3 space-y-4">
+          {posts.length > 0 ? (
+            posts.map(post => (
+              <div key={post.id} className="bg-white p-6 rounded-lg shadow-md">
+                <h2 className="text-2xl font-bold mb-2">{post.title}</h2>
+                <p>{post.content}</p>
+              </div>
+            ))
+          ) : (
+            <div className="bg-blue-600 text-white p-4 rounded-lg shadow-md text-center">
+              Nothing here yet!
+            </div>
+          )}
         </section>
       </main>
     </div>
@@ -98,7 +89,7 @@ const PublicSite = ({ onLogin }) => {
 
 
 // --- Admin Dashboard Components ---
-const AdminDashboard = ({ user, onLogout }) => {
+const AdminDashboard = ({ onLogout }) => {
   const [adminPage, setAdminPage] = useState('write');
 
   return (
@@ -147,6 +138,49 @@ const AdminNavButton = ({ name, currentPage, setPage, children }) => {
 
 // --- Admin Sub-Pages ---
 const WritePage = () => {
+  const [title, setTitle] = useState('');
+  const [content, setContent] = useState('');
+  const [statusMessage, setStatusMessage] = useState({ type: '', text: '' });
+
+  const handlePublish = async () => {
+    if (!title.trim() || !content.trim()) {
+      setStatusMessage({ type: 'error', text: 'Please enter a title and content.' });
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_URL}/posts`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: title,
+          content: content,
+          feather_type: 'Text', // Defaulting to 'Text' feather
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create post');
+      }
+
+      const newPost = await response.json();
+      console.log('Successfully created post:', newPost);
+      setStatusMessage({ type: 'success', text: 'Post published successfully!' });
+      // Clear fields after successful post
+      setTitle('');
+      setContent('');
+    } catch (error) {
+      console.error('Error publishing post:', error);
+      setStatusMessage({ type: 'error', text: 'Error publishing post. Is the backend server running?' });
+    }
+
+    // Clear the message after 3 seconds
+    setTimeout(() => {
+      setStatusMessage({ type: '', text: '' });
+    }, 3000);
+  };
+
+
   return (
     <div className="bg-[#eee] text-gray-800 p-6 rounded-b-lg shadow-xl">
       <div className="grid grid-cols-3 gap-px bg-gray-300">
@@ -155,17 +189,26 @@ const WritePage = () => {
       </div>
       <div className="bg-white p-4">
         <label className="block text-sm font-medium text-gray-600 mb-1">Title</label>
-        <input type="text" className="w-full p-2 border border-gray-300 rounded-md mb-4" />
+        <input
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          className="w-full p-2 border border-gray-300 rounded-md mb-4"
+        />
 
         <label className="block text-sm font-medium text-gray-600 mb-1">Body</label>
         <div className="border border-gray-300 rounded-md">
           <div className="bg-gray-50 p-2 border-b">
-            {/* Mock Toolbar */}
             <span className="font-bold">H1 B</span> <i>I</i> ...
           </div>
-          <textarea className="w-full h-64 p-2 focus:outline-none" defaultValue="Words: 0"></textarea>
+          <textarea
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            className="w-full h-64 p-2 focus:outline-none"
+          ></textarea>
         </div>
 
+        {/* Other form fields like Status, Slug etc. can be added to state as needed */}
         <div className="grid grid-cols-2 gap-4 mt-4">
           <div>
             <label className="block text-sm font-medium text-gray-600">Status</label>
@@ -185,20 +228,47 @@ const WritePage = () => {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-600">Timestamp</label>
-            <input type="text" readOnly defaultValue="2025-09-04 13:07:23" className="w-full p-2 border border-gray-300 rounded-md mt-1 bg-gray-100" />
+            <input type="text" readOnly value={new Date().toISOString().slice(0, 19).replace('T', ' ')} className="w-full p-2 border border-gray-300 rounded-md mt-1 bg-gray-100" />
           </div>
         </div>
 
         <div className="flex space-x-4 mt-6">
-          <button className="flex-1 bg-green-500 text-white py-3 rounded-md font-bold hover:bg-green-600">Publish</button>
+          <button onClick={handlePublish} className="flex-1 bg-green-500 text-white py-3 rounded-md font-bold hover:bg-green-600">Publish</button>
           <button className="flex-1 bg-blue-100 text-blue-700 py-3 rounded-md font-bold hover:bg-blue-200">Save</button>
         </div>
       </div>
+      {statusMessage.text && (
+        <div className={`mt-4 p-3 rounded-md text-center font-semibold ${statusMessage.type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+          }`}>
+          {statusMessage.text}
+        </div>
+      )}
     </div>
   );
 };
 
 const ManagePage = () => {
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const response = await fetch(`${API_URL}/posts`);
+        if (!response.ok) throw new Error('Failed to fetch posts');
+        const data = await response.json();
+        setPosts(data);
+      } catch (error) {
+        console.error("Fetch error:", error.message);
+        setError("Failed to load posts. Is the backend server running?");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPosts();
+  }, []);
+
   return (
     <div className="bg-[#eee] text-gray-800 p-6 rounded-b-lg shadow-xl">
       <div className="grid grid-cols-7 gap-px bg-gray-300 mb-4">
@@ -224,11 +294,29 @@ const ManagePage = () => {
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td colSpan="5" className="p-3 text-center text-gray-500">
-                ⊗ No results
-              </td>
-            </tr>
+            {loading ? (
+              <tr><td colSpan="5" className="p-3 text-center text-gray-500">Loading posts...</td></tr>
+            ) : error ? (
+              <tr><td colSpan="5" className="p-3 text-center text-red-500">{error}</td></tr>
+            ) : posts.length > 0 ? (
+              posts.map(post => (
+                <tr key={post.id} className="border-b">
+                  <td className="p-3">{post.title}</td>
+                  <td className="p-3">{/* Date would go here */}</td>
+                  <td className="p-3">Public</td>
+                  <td className="p-3">Admin</td>
+                  <td className="p-3">
+                    <button className="text-blue-500 hover:underline">Edit</button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="5" className="p-3 text-center text-gray-500">
+                  ⊗ No results
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
@@ -237,6 +325,7 @@ const ManagePage = () => {
 };
 
 const SettingsPage = () => {
+  // This page remains static for now, as there are no backend endpoints for settings.
   return (
     <div className="bg-[#eee] text-gray-800 p-6 rounded-b-lg shadow-xl">
       <div className="grid grid-cols-4 gap-px bg-gray-300 mb-4">
@@ -290,7 +379,9 @@ const SettingSelect = ({ label, options }) => (
   </div>
 )
 
-// --- Extend Page Components (NEW) ---
+// --- Extend Page Components (NEWLY RE-ADDED) ---
+// NOTE: The backend provided does not have endpoints for managing these settings.
+// This UI is functional on the frontend but will not persist changes without backend support.
 
 const modulesData = {
   enabled: [
