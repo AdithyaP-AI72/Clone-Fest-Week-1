@@ -1,0 +1,13 @@
+# Python virtual environment folder
+venv/
+
+# Byte-compiled Python files
+__pycache__/
+*.pyc
+
+# Local SQLite database file
+site.db
+
+# Other temporary files
+.env
+*.log
